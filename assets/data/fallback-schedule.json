@@ -1,0 +1,35 @@
+[
+  {
+    "id": "fallback-1",
+    "title": "Registration & Check-In",
+    "startTime": "2026-09-11T16:00:00",
+    "endTime": "2026-09-11T20:00:00",
+    "locationKey": "registration",
+    "locationDisplayName": "Registration",
+    "track": "General",
+    "presenter": null,
+    "details": "Pick up your badge and welcome packet."
+  },
+  {
+    "id": "fallback-2",
+    "title": "Opening Ceremony",
+    "startTime": "2026-09-11T19:00:00",
+    "endTime": "2026-09-11T20:00:00",
+    "locationKey": "main-hall",
+    "locationDisplayName": "Main Hall",
+    "track": "Main Stage",
+    "presenter": "Convention Staff",
+    "details": "Welcome remarks and weekend kickoff."
+  },
+  {
+    "id": "fallback-3",
+    "title": "Open Gaming",
+    "startTime": "2026-09-11T20:00:00",
+    "endTime": "2026-09-11T23:00:00",
+    "locationKey": "gaming-room-a",
+    "locationDisplayName": "Gaming Room A",
+    "track": "Gaming",
+    "presenter": null,
+    "details": "Bring a game or join one."
+  }
+]
