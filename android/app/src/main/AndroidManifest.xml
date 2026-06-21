@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fetch the schedule CSV. Flutter only adds this to the debug manifest,
+         so release builds (Play) need it declared here explicitly. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <!-- "You are here" dot on the venue map (geolocator). -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
