@@ -83,19 +83,19 @@ class NotificationService {
   // Notification IDs are ints; derive a stable positive one from the event ID.
   int _idFor(String eventId) => eventId.hashCode & 0x7fffffff;
 
-  /// Schedules (or reschedules) the reminder for [event]. [ReminderOption.none]
-  /// simply cancels any existing reminder. Fire-times in the past are skipped.
-  Future<void> schedule(Event event, ReminderOption option) async {
+  /// Schedules (or reschedules) the reminder for [event]. A none reminder
+  /// simply cancels any existing one. Fire-times in the past are skipped.
+  Future<void> schedule(Event event, Reminder reminder) async {
     await init();
     await cancel(event.id);
-    final lead = option.leadTime;
+    final lead = reminder.leadMinutes;
     if (lead == null) return;
-    final fireAt = event.startTime.subtract(lead);
+    final fireAt = event.startTime.subtract(Duration(minutes: lead));
     if (!fireAt.isAfter(DateTime.now())) return;
 
     final loc = event.locationDisplayName;
     final timeStr = DateFormat('h:mm a').format(event.startTime);
-    final body = option == ReminderOption.atStart
+    final body = lead == 0
         ? (loc != null ? 'Starting now · $loc' : 'Starting now')
         : (loc != null ? 'Starts at $timeStr · $loc' : 'Starts at $timeStr');
 

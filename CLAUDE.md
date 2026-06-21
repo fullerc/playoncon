@@ -32,7 +32,7 @@ lib/
     csv_parser.dart                   grid CSV walker (see "Sheet format")
     schedule_repository.dart          fetch/cache/expose events (StateNotifier)
     locations_store.dart              hotspot read/write + venueLocationsProvider
-    saved_events_store.dart           "My Schedule": event ID → ReminderOption (persisted)
+    saved_events_store.dart           "My Schedule": event ID → Reminder + last custom (persisted)
     notification_service.dart         local reminder scheduling (flutter_local_notifications)
     location_service.dart             device position stream (geolocator) for the map dot
     map_georeference.dart             GPS → normalized image coords (affine fit to control points)
@@ -188,11 +188,15 @@ Pins with no column (dorms, archery, pool amenities, etc.) are wayfinding-only.
 - The cache file (`<appDocs>/schedule_cache.json`) and the fallback bundled JSON store
   events with the `attributes` field; old caches without it default to `[]`.
 - "My Schedule" lives in `<appDocs>/saved_events.json` (`savedEventsProvider`) as a map of
-  event ID → `ReminderOption` (`none`/`atStart`/`fifteenMinutesBefore`). IDs are the parser's
-  `title|start|location` hash, so a save survives re-sync unless the sheet cell
-  text/time/venue changes — then it silently drops (acceptable for a con app). Saving prompts
-  a reminder dialog (`save_event_action.dart`); choosing a non-none option requests
-  notification permission then schedules via `NotificationService`.
+  event ID → `Reminder`, where `Reminder.leadMinutes` is `null` (none) / `0` (at start) /
+  `>0` (that many minutes before). IDs are the parser's `title|start|location` hash, so a save
+  survives re-sync unless the sheet cell text/time/venue changes — then it silently drops
+  (acceptable for a con app). Decode tolerates the legacy enum-name strings.
+- Saving prompts a reminder dialog (`save_event_action.dart`): once a custom time has been
+  picked it leads the list as a one-tap option, followed by **Custom…** (1–120 min wheel),
+  **At start time**, **No reminder**. That last custom value persists in
+  `<appDocs>/last_custom_reminder.json` (`lastCustomReminderProvider`). A non-none choice
+  requests notification permission then schedules via `NotificationService`.
 - "All Sessions" is a `ScrollablePositionedList` that opens at `_nowAnchorIndex` — the first
   session whose end is after `DateTime.now()` (its day header if it's first of the day),
   falling back to the top when the schedule is entirely past/not-yet-started. Applied once on

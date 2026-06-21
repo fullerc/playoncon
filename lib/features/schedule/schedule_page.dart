@@ -81,7 +81,7 @@ class _EventList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final saved = savedOnly
         ? ref.watch(savedEventsProvider)
-        : const <String, ReminderOption>{};
+        : const <String, Reminder>{};
     final visible = savedOnly
         ? events.where((e) => saved.containsKey(e.id)).toList()
         : events;
