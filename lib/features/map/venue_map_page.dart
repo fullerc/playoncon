@@ -1209,8 +1209,8 @@ class _MapControls extends StatelessWidget {
   }
 }
 
-/// Bottom info card for the selected pin: identity row (icon · name · blurb ·
-/// walk time), a divider, then the now/next status line.
+/// Bottom info card for the selected pin: identity row (icon · name · blurb),
+/// then — when there's a current/next session — a divider and status line.
 class _VenueInfoSheet extends StatelessWidget {
   final VenueLocation location;
   final VenueMeta meta;
@@ -1281,23 +1281,6 @@ class _VenueInfoSheet extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.directions_walk,
-                        size: 17, color: PocColors.forestDark),
-                    const SizedBox(width: 3),
-                    Text(
-                      '${meta.walkMinutes}m',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: PocColors.forestDark,
-                      ),
-                    ),
-                  ],
-                ),
                 IconButton(
                   visualDensity: VisualDensity.compact,
                   iconSize: 18,
@@ -1308,14 +1291,17 @@ class _VenueInfoSheet extends StatelessWidget {
                 ),
               ],
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Divider(height: 1, thickness: 1, color: Color(0xFFD8CBA8)),
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: _StatusLine(status: status),
-            ),
+            if (status != null) ...[
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child:
+                    Divider(height: 1, thickness: 1, color: Color(0xFFD8CBA8)),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: _StatusLine(status: status),
+              ),
+            ],
           ],
         ),
       ),
