@@ -1,8 +1,8 @@
 {
   "fill" : {
     "linear-gradient" : [
-      "display-p3:0.05258,0.07910,0.05634,1.00000",
-      "display-p3:0.05258,0.07910,0.05634,1.00000"
+      "display-p3:0.95603,0.95217,0.94043,1.00000",
+      "display-p3:0.89690,0.88530,0.85791,1.00000"
     ]
   },
   "groups" : [
@@ -12,7 +12,7 @@
           "image-name" : "layer_4_text_and_icons.png",
           "name" : "layer_4_text_and_icons",
           "position" : {
-            "scale" : 0.67,
+            "scale" : 0.55,
             "translation-in-points" : [
               0,
               0
@@ -23,7 +23,7 @@
           "image-name" : "layer_3_green_elements.png",
           "name" : "layer_3_green_elements",
           "position" : {
-            "scale" : 0.67,
+            "scale" : 0.55,
             "translation-in-points" : [
               0,
               0
@@ -34,7 +34,7 @@
           "image-name" : "layer_2_brown_elements.png",
           "name" : "layer_2_brown_elements",
           "position" : {
-            "scale" : 0.67,
+            "scale" : 0.55,
             "translation-in-points" : [
               0,
               0
@@ -47,7 +47,7 @@
           "image-name" : "layer_1_inner_background.png",
           "name" : "layer_1_inner_background",
           "position" : {
-            "scale" : 0.67,
+            "scale" : 0.55,
             "translation-in-points" : [
               0,
               0
