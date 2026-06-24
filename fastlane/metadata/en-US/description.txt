@@ -1,0 +1,29 @@
+Play On Con: the official companion app
+
+Play On Con is a tabletop and gaming convention held each year at the Alabama 4-H Center in Columbiana, Alabama — four days of theater, RPGs, board games, video games, parties, and the outdoors. This app is your pocket-sized guide to the weekend.
+
+Designed offline-first. The schedule and venue map work without a network connection, so you're covered in the cabins, the Lodge, and anywhere on the property where signal gets thin.
+
+WHAT'S IN THE APP
+
+• Full schedule, all four days — every session across every venue, opening to the current time slot so you always land on what's on now.
+
+• My Schedule — save the sessions you don't want to miss.
+
+• Reminders — local notifications before any saved session, at start time or a custom number of minutes ahead. No account, no push server.
+
+• Venue map with "you are here" — color-coded pins for Stages, Gaming, Parties, Outdoors, and Stay & Eat. Tap any pin for what's happening there. Location is opt-in.
+
+• Show on map — jump straight from any session to its venue pin.
+
+• Session tags — quick badges for Ages 21+, PG-13, Apprentice Track, Auditioned/Casted, Sensory Friendly, and Sign-up at Open Gaming.
+
+• Discord and sync status — quick link to the community and a clear last-synced indicator.
+
+PRIVACY
+
+No account. No login. No ads. No tracking. The app downloads the published schedule and keeps a local copy. Location is opt-in and never leaves your device. See https://fullerc.github.io/playoncon/ for the full privacy policy.
+
+ABOUT PLAY ON CON
+
+Play On Con is held annually at the Alabama 4-H Center in Columbiana, Alabama. This app is the official companion for attendees.
