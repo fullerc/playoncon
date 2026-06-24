@@ -55,9 +55,9 @@ class NotificationService {
     _initialized = true;
   }
 
-  /// Requests notification permission (and, on Android, exact-alarm access).
-  /// Call this contextually — when the user first opts into a reminder — so the
-  /// prompt isn't the first thing they see on launch.
+  /// Requests notification permission. Call this contextually — when the user
+  /// first opts into a reminder — so the prompt isn't the first thing they see
+  /// on launch.
   Future<bool> requestPermission() async {
     await init();
     final ios = _plugin.resolvePlatformSpecificImplementation<
@@ -73,9 +73,7 @@ class NotificationService {
     final android = _plugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
     if (android != null) {
-      final granted = await android.requestNotificationsPermission() ?? false;
-      await android.requestExactAlarmsPermission();
-      return granted;
+      return await android.requestNotificationsPermission() ?? false;
     }
     return true;
   }
@@ -114,7 +112,9 @@ class NotificationService {
         ),
         iOS: DarwinNotificationDetails(),
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      // Inexact: Play Store restricts USE_EXACT_ALARM to calendar/alarm-clock
+      // apps. A few minutes of slack on a reminder is fine for con events.
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       payload: event.id,
     );
   }
