@@ -21,14 +21,17 @@
 set -euo pipefail
 
 # --- EDIT THESE WHEN THE 2026 SCHEDULE IS LIVE ---------------------------------
-SHEET_BASE="https://docs.google.com/spreadsheets/d/18HQ0b8jrP-iK_EVxPYffDvA3RBs6viX0/export?format=csv"
-GID_THU_FRI="2027634205"
-GID_SAT_SUN="1820056449"
+# Spreadsheet is addressed by tab NAME (not gid) because the source workbook is
+# an uploaded .xlsx — gids aren't exposed in its share HTML. gviz/tq returns
+# CSV by visible tab name; %20=" " and %2B="+" url-encoded.
+SHEET_BASE="https://docs.google.com/spreadsheets/d/1IFsCk650WKiaJ0FDiPOmPNCg1Ysyc6FF/gviz/tq?tqx=out:csv"
+TAB_THU_FRI="2026%20Thursday%20%2B%20Friday"
+TAB_SAT_SUN="2026%20Saturday%20%2B%20Sunday"
 DISCORD_URL="https://discord.gg/4GQgGnXN5"
 EVENT_THURSDAY="2026-07-02"   # yyyy-MM-dd of the convention's Thursday
 # ------------------------------------------------------------------------------
 
-CSV_URLS="${SHEET_BASE}&gid=${GID_THU_FRI},${SHEET_BASE}&gid=${GID_SAT_SUN}"
+CSV_URLS="${SHEET_BASE}&sheet=${TAB_THU_FRI},${SHEET_BASE}&sheet=${TAB_SAT_SUN}"
 
 echo "Building release .aab for Google Play..."
 flutter build appbundle \
