@@ -60,11 +60,17 @@ class CsvScheduleParser {
   List<Event> parse(String csvText) {
     if (_eventThursday == null) return const [];
 
-    // Source uses CRLF for row breaks but bare LF inside quoted multi-line cells.
-    // Default eol ('\r\n') correctly distinguishes the two.
+    // Google's two CSV export endpoints behave differently:
+    //   * pub?output=csv  — CRLF row breaks, bare LF inside quoted multi-line cells.
+    //   * gviz/tq?…       — LF for everything (rows AND inside quoted cells).
+    // Normalize CRLF→LF and parse with eol='\n'. The quote-aware tokenizer still
+    // keeps multi-line cell content intact because LFs inside quotes are consumed
+    // before the row-break check sees them.
+    final normalized = csvText.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
     final rows = const CsvToListConverter(
       shouldParseNumbers: false,
-    ).convert(csvText);
+      eol: '\n',
+    ).convert(normalized);
     if (rows.isEmpty) return const [];
 
     final venueRowIdx = _findVenueHeaderRow(rows);
