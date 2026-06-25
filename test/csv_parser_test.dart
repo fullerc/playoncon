@@ -96,13 +96,15 @@ void main() {
   });
 
   test('extracts inline emoji attributes and strips them from titles', () {
-    // 2026 schedule format: 🔞→18+, 🍷→21+, 🎓→AT, ⚠️→PG13, 🎧→SF.
+    // 2026 schedule format: 🚫/🔞→18+, 🔥/🍷→21+, 🎓→AT, ⚠️→PG13, 🎧→SF.
+    // The 🚫/🔥 pair replaced 🔞/🍷 mid-2026 — both are still accepted.
     final csv = [
       ',Theater,,Main Gaming\r\n',
       'Thursday,,,\r\n',
       '4 PM,Make a Holiday Card 🎓,,Holiday Party ⚠️\r\n',
-      '5 PM,Adult Swim 🍷,,Coffee Service 🎧\r\n',
-      '6 PM,Party 🔞,,Welcome Wagon\r\n',
+      '5 PM,Adult Swim 🔥,,Coffee Service 🎧\r\n',
+      '6 PM,After Dark Party 🚫,,Welcome Wagon\r\n',
+      '7 PM,Wine Tasting 🍷,,Late Night 🔞\r\n',
     ].join();
 
     final parser = CsvScheduleParser(
@@ -115,7 +117,9 @@ void main() {
     expect(byTitle['Holiday Party']!.attributes, ['PG13']);
     expect(byTitle['Adult Swim']!.attributes, ['21+']);
     expect(byTitle['Coffee Service']!.attributes, ['SF']);
-    expect(byTitle['Party']!.attributes, ['18+']);
+    expect(byTitle['After Dark Party']!.attributes, ['18+']);
+    expect(byTitle['Wine Tasting']!.attributes, ['21+']);
+    expect(byTitle['Late Night']!.attributes, ['18+']);
     expect(byTitle['Welcome Wagon']!.attributes, isEmpty);
   });
 

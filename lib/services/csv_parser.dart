@@ -212,8 +212,11 @@ class CsvScheduleParser {
 
   /// Inline emoji used as attribute tags in the 2026+ schedule, in priority
   /// order. Listed as (emoji, code) so the U+FE0F variation-selector form of
-  /// ⚠️ is stripped before the bare ⚠ fallback runs.
+  /// ⚠️ is stripped before the bare ⚠ fallback runs. The 🚫/🔥 pair replaced
+  /// 🔞/🍷 mid-2026; both are accepted so older cached schedules keep working.
   static const List<(String, String)> _emojiAttributes = [
+    ('🚫', '18+'),
+    ('🔥', '21+'),
     ('🔞', '18+'),
     ('🍷', '21+'),
     ('🎓', 'AT'),
