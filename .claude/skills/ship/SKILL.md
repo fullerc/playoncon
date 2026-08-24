@@ -1,6 +1,6 @@
 ---
 name: ship
-description: "Ship the current working-directory changes to BOTH TestFlight (iOS) and Google Play internal testers (Android). Bumps the +N build number in pubspec.yaml, runs the iOS and Android builds sequentially, uploads to both stores in parallel, commits the changed files + pubspec bump, pushes to remote, and writes release notes. Invoke when the user says something like 'ship this', 'ship it', 'commit and push this, add a new version number and push to testers', 'ship this to Play', 'ship to TestFlight', or any close variant."
+description: "Ship the current working-directory changes to BOTH TestFlight (iOS) and Google Play internal testers (Android). Bumps the semantic X.Y.Z+N version in pubspec.yaml, runs the iOS and Android builds sequentially, uploads to both stores in parallel, commits the changed files + pubspec bump + CHANGELOG.md entry, pushes to remote, and writes release notes. Invoke when the user says something like 'ship this', 'ship it', 'commit and push this, add a new version number and push to testers', 'ship this to Play', 'ship to TestFlight', or any close variant."
 ---
 
 # Ship to TestFlight + Play internal testers (PlayOnCon)
@@ -20,16 +20,16 @@ If any debug `flutter run` task is still running in the background, `TaskStop` i
 
 ## Step 1 — Set the version
 
-The version string is `YYYY.M.D+N` — marketing = **today's date**, build number = monotonically incrementing across ships (never resets on a date change). Run `date +%Y.%-n.%-d` to get today's date in the exact format (no zero-padding on month/day; `2026.7.4`, not `2026.07.04`).
+The version string in `pubspec.yaml` is `X.Y.Z+N` — one **semantic marketing version** (two or three numeric components, no suffixes) plus one build number, shared by both stores from this single line (iOS reads `FLUTTER_BUILD_NAME`/`FLUTTER_BUILD_NUMBER`, Android reads `flutter.versionName`/`flutter.versionCode`). Same scheme as LockItUp: the components move by **what shipped**, never by the calendar.
+
+Find the previous release in the newest `CHANGELOG.md` entry (it records the build number) and cross-check `pubspec.yaml` — in this flow pubspec is committed only after both uploads succeed, so it records what last shipped. If the two disagree, trust the higher build number and flag the mismatch.
 
 Read `pubspec.yaml`, then:
 
-- **If the marketing date matches today**: increment `+N`.
-  `version: 2026.7.4+25` → `version: 2026.7.4+26`
-- **If the marketing date is in the past** (a day or more old): set marketing to today's date AND increment `+N`.
-  `version: 2026.7.2+24` → `version: 2026.7.4+25`
+- **Marketing version**: bump by change type since the last ship — fixes only → patch (`2026.7.12` → `2026.7.13`), user-visible features → minor (`2026.7.12` → `2026.8.0`), a redesign or compatibility break → major (`2026.7.12` → `2027.0.0`). If the user names a version, use it. Say which bump you chose and why.
+- **Build number `+N`**: previous + 1. Monotonic across the whole app — TestFlight and Play both require it to strictly increase, regardless of whether the marketing version changed. Never reset it.
 
-The `+N` build number is monotonic across the whole app — TestFlight and Play both require it to strictly increase, regardless of whether the marketing version changed. Never reset it. Never bump marketing to a *future* date, and never bump marketing backward.
+Both parts only ever move forward — Apple rejects a marketing version below one that already shipped. The `2026.x` range is historical: through `2026.7.12+27` the app used a date-based scheme (marketing = ship date), and the semantic scheme continues numerically from there. Version numbers that look like dates are a leftover of that history, not a rule. Never renumber downward (e.g. to `1.0.0`).
 
 ## Step 2 — Build both artifacts (sequentially)
 
@@ -93,17 +93,26 @@ Successfully finished the upload to Google Play
 
 Only after **both** uploads have succeeded — never commit a version bump that only shipped to one store, because the next ship attempt will re-bump and skip the failed store.
 
+First prepend the release entry to `CHANGELOG.md` (newest first) — this is the durable record the next ship's Step 1 reads:
+
+```markdown
+## <version> (build <n>) — <yyyy-mm-dd>
+
+- <the short-form bullets from Step 5 — write them now>
+```
+
 Stage by **explicit path** — never `git add .` / `-A`. Include:
 
 - Every file listed by `git status --short` that was part of what shipped (source + test edits).
 - `pubspec.yaml`.
+- `CHANGELOG.md`.
 
 Exclude machine-specific noise: `ios/Runner.xcodeproj/project.pbxproj` (unless the user says otherwise), `android/local.properties`, `Pods/`, `.dart_tool/`.
 
 Commit message: one line summarizing what shipped, ending with `; bump to <version>`. Follow the repo's existing style (see `git log --oneline -5`):
 
 ```
-<short summary of the change>; bump to 2026.7.2+23
+<short summary of the change>; bump to 2026.7.13+28
 ```
 
 If there's a compelling "why," add a body paragraph — but keep it tight. Then:
@@ -118,7 +127,7 @@ Standing authorization applies — no need to ask before pushing. Push only the 
 
 At the end of the run, emit release notes in two forms so Fuller can paste either into Play Console / App Store Connect (both have per-build "What to test" fields) or share with the team:
 
-**Short (store consoles):** bullet list, under 500 chars, user-facing language ("Rocky Horror now starts at 11:30 PM", not "parser fix"). Focus on what the tester will *see or feel*, not the implementation.
+**Short (store consoles):** bullet list, under 500 chars, user-facing language ("Rocky Horror now starts at 11:30 PM", not "parser fix"). Focus on what the tester will *see or feel*, not the implementation. This is the same text committed to `CHANGELOG.md` in Step 4 — reuse it, don't rewrite it.
 
 **Longer (team/internal):** 3–6 bullets with the technical framing — what changed, why, and any behavior detail that matters when triaging feedback.
 
@@ -130,7 +139,7 @@ Derive both from the commit body plus the file diff — don't invent features. I
 - **Debug run still holds the build cache** → TaskStop the flutter run task before invoking either build script.
 - **fastlane "APK specifies a version code that has already been used"** → the +N didn't get baked in; re-verify pubspec and rerun the build.
 - **fastlane "Package not found"** → someone changed the package name; the current value is `com.fuller.playoncon`.
-- **altool "Invalid Pre-Release Train. The train version 'X.Y.Z' is closed"** (error 90186) → Apple has closed that marketing-version train. Since the skill sets marketing to today's date on every ship, this only fires when re-shipping on the same day after Apple has already closed today's train. Bump marketing forward by one day (`2026.7.4` → `2026.7.5`) and rebuild both — flag this to the user in the commit message since it's an owner-visible version drift from the actual calendar date.
+- **altool "Invalid Pre-Release Train. The train version 'X.Y.Z' is closed"** (error 90186) → Apple has closed that marketing-version train (typically because that version was released on the App Store). Bump the patch component (`2026.7.13` → `2026.7.14`), rebuild both platforms so they stay on one version, and note the extra bump in the commit message.
 - **altool 401 / "App not found"** → wrong ASC Key ID + Issuer ID pair, or the `.p8` file is missing. The credentials memory has the correct values.
 - **One store succeeded, the other failed** → do NOT commit yet. Fix the failure, re-upload only the failed store using the already-built artifact (no rebuild needed unless the artifact is stale), then commit once both are up.
 - **iOS export-compliance halts the build** → `ITSAppUsesNonExemptEncryption=false` should already be set in `ios/Runner/Info.plist`; if it's missing, add it before rebuilding.

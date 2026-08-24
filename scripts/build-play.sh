@@ -16,7 +16,9 @@
 #   2. From the project root, run:  ./scripts/build-play.sh
 #   3. Upload the printed .aab to the Play Console testing track.
 #
-# NOTE: bump the build number in pubspec.yaml (after the "+") before each upload.
+# NOTE: set the version in pubspec.yaml (semantic X.Y.Z + strictly increasing
+# "+N" build number) before each upload — see CHANGELOG.md and
+# .claude/skills/ship/SKILL.md for the scheme.
 
 set -euo pipefail
 

@@ -14,9 +14,10 @@
 #   3. When it finishes, the file to upload is printed at the end
 #      (build/ios/ipa/playoncon.ipa).
 #
-# NOTE: increment the build number in pubspec.yaml (the part after the "+",
-# e.g. 1.0.0+1 -> 1.0.0+2) before EACH upload, or App Store Connect rejects it
-# as a duplicate.
+# NOTE: set the version in pubspec.yaml before EACH upload — a semantic X.Y.Z
+# marketing version plus a strictly increasing "+N" build number (App Store
+# Connect rejects a reused build number as a duplicate). The scheme is
+# documented in CHANGELOG.md and .claude/skills/ship/SKILL.md.
 
 set -euo pipefail
 

@@ -1,6 +1,12 @@
 name: playoncon
 description: "Play On Con — convention companion app."
 publish_to: 'none'
+# Version scheme (matches LockItUp): X.Y.Z+N — one semantic marketing version
+# (patch = fixes, minor = features, major = breaking/redesign) plus one build
+# number shared by both stores. +N increases on every store upload and never
+# resets; both parts only move forward. Committed only after a successful ship,
+# so this line records what last shipped — see CHANGELOG.md and the ship skill.
+# Versions up to 2026.7.12 predate the scheme (they were the ship date).
 version: 2026.7.12+27
 
 environment:
