@@ -1,7 +1,8 @@
 # Play On Con changelog
 
-Newest first. Every store upload gets an entry: `## <version> (build <n>) — <date>`.
-The build number is the `+N` in `pubspec.yaml` — one integer shared by TestFlight
+Newest first. Every release gets one entry: `## <version> (build <n>) — <date>`
+— a release is the same version and build number uploaded to both stores. The
+build number is the `+N` in `pubspec.yaml` — one integer shared by TestFlight
 and Google Play, and it only ever goes up. The ship skill reads the newest entry
 here to find the previous release.
 

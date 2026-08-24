@@ -17,8 +17,8 @@
 #   3. Upload the printed .aab to the Play Console testing track.
 #
 # NOTE: set the version in pubspec.yaml (semantic X.Y.Z + strictly increasing
-# "+N" build number) before each upload — see CHANGELOG.md and
-# .claude/skills/ship/SKILL.md for the scheme.
+# "+N" build number, the same version+N for both stores) before each release —
+# see CHANGELOG.md and .claude/skills/ship/SKILL.md for the scheme.
 
 set -euo pipefail
 

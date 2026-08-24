@@ -20,13 +20,13 @@ If any debug `flutter run` task is still running in the background, `TaskStop` i
 
 ## Step 1 — Set the version
 
-The version string in `pubspec.yaml` is `X.Y.Z+N` — one **semantic marketing version** (two or three numeric components, no suffixes) plus one build number, shared by both stores from this single line (iOS reads `FLUTTER_BUILD_NAME`/`FLUTTER_BUILD_NUMBER`, Android reads `flutter.versionName`/`flutter.versionCode`). Same scheme as LockItUp: the components move by **what shipped**, never by the calendar.
+The version string in `pubspec.yaml` is `X.Y.Z+N` — one **semantic marketing version** (exactly three numeric components: pubspec's `version:` line is parsed as semver, so `X.Y.Z` only, no suffixes — normalize a user-named two-component version like `2027.0` to `2027.0.0`) plus one build number, shared by both stores from this single line (iOS reads `FLUTTER_BUILD_NAME`/`FLUTTER_BUILD_NUMBER`, Android reads `flutter.versionName`/`flutter.versionCode`). Same scheme as LockItUp: the components move by **what shipped**, never by the calendar.
 
 Find the previous release in the newest `CHANGELOG.md` entry (it records the build number) and cross-check `pubspec.yaml` — in this flow pubspec is committed only after both uploads succeed, so it records what last shipped. If the two disagree, trust the higher build number and flag the mismatch.
 
 Read `pubspec.yaml`, then:
 
-- **Marketing version**: bump by change type since the last ship — fixes only → patch (`2026.7.12` → `2026.7.13`), user-visible features → minor (`2026.7.12` → `2026.8.0`), a redesign or compatibility break → major (`2026.7.12` → `2027.0.0`). If the user names a version, use it. Say which bump you chose and why.
+- **Marketing version**: bump by change type since the last ship — fixes only → patch (`2026.7.12` → `2026.7.13`), user-visible features → minor (`2026.7.12` → `2026.8.0`), a redesign or compatibility break → major (`2026.7.12` → `2027.0.0`). A rebuild-only re-ship with nothing user-facing changed keeps the marketing version as is and bumps only `+N`. If the user names a version, use it. Say which bump you chose and why.
 - **Build number `+N`**: previous + 1. Monotonic across the whole app — TestFlight and Play both require it to strictly increase, regardless of whether the marketing version changed. Never reset it.
 
 Both parts only ever move forward — Apple rejects a marketing version below one that already shipped. The `2026.x` range is historical: through `2026.7.12+27` the app used a date-based scheme (marketing = ship date), and the semantic scheme continues numerically from there. Version numbers that look like dates are a leftover of that history, not a rule. Never renumber downward (e.g. to `1.0.0`).
@@ -101,6 +101,9 @@ First prepend the release entry to `CHANGELOG.md` (newest first) — this is the
 - <the short-form bullets from Step 5 — write them now>
 ```
 
+For a rebuild-only ship (marketing version unchanged, nothing user-facing),
+the entry body is a single line: `- Rebuild only; no user-facing changes.`
+
 Stage by **explicit path** — never `git add .` / `-A`. Include:
 
 - Every file listed by `git status --short` that was part of what shipped (source + test edits).
@@ -131,7 +134,7 @@ At the end of the run, emit release notes in two forms so Fuller can paste eithe
 
 **Longer (team/internal):** 3–6 bullets with the technical framing — what changed, why, and any behavior detail that matters when triaging feedback.
 
-Derive both from the commit body plus the file diff — don't invent features. If the change is purely mechanical (build number only), say so and skip the short form.
+Derive both from what shipped — the staged diff and the commit summary composed in Step 4 — don't invent features. For a rebuild-only ship the CHANGELOG entry already says `Rebuild only; no user-facing changes` — say so and skip the store-console form.
 
 ## Failure modes to recognize fast
 
@@ -139,7 +142,7 @@ Derive both from the commit body plus the file diff — don't invent features. I
 - **Debug run still holds the build cache** → TaskStop the flutter run task before invoking either build script.
 - **fastlane "APK specifies a version code that has already been used"** → the +N didn't get baked in; re-verify pubspec and rerun the build.
 - **fastlane "Package not found"** → someone changed the package name; the current value is `com.fuller.playoncon`.
-- **altool "Invalid Pre-Release Train. The train version 'X.Y.Z' is closed"** (error 90186) → Apple has closed that marketing-version train (typically because that version was released on the App Store). Bump the patch component (`2026.7.13` → `2026.7.14`), rebuild both platforms so they stay on one version, and note the extra bump in the commit message.
+- **altool "Invalid Pre-Release Train. The train version 'X.Y.Z' is closed"** (error 90186) → Apple has closed that marketing-version train (typically because that version was released on the App Store). Bump the patch component AND increment `+N` again (`2026.7.13+28` → `2026.7.14+29`), rebuild both platforms, and re-upload **both** stores — this overrides the "one store succeeded" rule below: the already-built IPA still carries the closed version, and Play would reject a rebuilt AAB at the old `+N` as a duplicate. A superseded build already sitting on the Play internal track is harmless. Note the extra bump in the commit message.
 - **altool 401 / "App not found"** → wrong ASC Key ID + Issuer ID pair, or the `.p8` file is missing. The credentials memory has the correct values.
-- **One store succeeded, the other failed** → do NOT commit yet. Fix the failure, re-upload only the failed store using the already-built artifact (no rebuild needed unless the artifact is stale), then commit once both are up.
+- **One store succeeded, the other failed** → do NOT commit yet. Fix the failure, re-upload only the failed store using the already-built artifact (no rebuild needed unless the artifact is stale), then commit once both are up. Exception: a 90186 closed train — see that bullet — requires re-bumping and re-uploading both stores.
 - **iOS export-compliance halts the build** → `ITSAppUsesNonExemptEncryption=false` should already be set in `ios/Runner/Info.plist`; if it's missing, add it before rebuilding.
