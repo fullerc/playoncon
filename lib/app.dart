@@ -14,6 +14,7 @@ class PlayOnConApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Play On Con',
+      debugShowCheckedModeBanner: false,
       theme: PocTheme.light(),
       darkTheme: PocTheme.dark(),
       themeMode: ThemeMode.system,
